@@ -1,0 +1,54 @@
+name: Compile Sailfish OS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build SFOS
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        device: [xiaomi-vayu, oneplus-cheeseburger]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - name: Install sfbootstrap Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git coreutils wget bzip2 tar bc lzop bison flex ccache rsync python3
+
+      - name: Initialize sfbootstrap Environment
+        run: |
+          chmod +x sfbootstrap.sh modules/*.sh device/*/*.sh
+          sudo -E ./sfbootstrap.sh init -y ${{ matrix.device }}
+
+      - name: Setup Platform SDK (Chroot)
+        run: sudo -E ./sfbootstrap.sh chroot
+
+      - name: Sync Android HAL & Packages
+        run: sudo -E ./sfbootstrap.sh sync
+
+      - name: Build Sailfish OS Image
+        run: sudo -E ./sfbootstrap.sh build
+
+      - name: Upload Flashable Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: sfos-build-${{ matrix.device }}
+          path: images/${{ matrix.device }}/*.zip
