@@ -91,7 +91,7 @@ sfb_sync_hybris_repos() {
 	if [ ! -d "$ANDROID_ROOT/.repo" ]; then
 		#sfb_hook_exec pre-repo-init
 		sfb_log "Initializing new $branch source tree..."
-		sfb_chroot habuild "repo init -u $REPO_INIT_URL -b $branch --platform=linux$extra_init_args" || return 1
+		sfb_chroot habuild sh -c "repo init -u $REPO_INIT_URL -b $branch --platform=linux$extra_init_args" || return 1
 		if [ "$REPO_LOCAL_MANIFESTS_URL" ]; then
 			git clone -b $branch "$REPO_LOCAL_MANIFESTS_URL" "$ANDROID_ROOT/.repo/local_manifests" || return 1
 		fi
@@ -101,7 +101,7 @@ sfb_sync_hybris_repos() {
 	if sfb_manual_hybris_patches_applied; then
 		sfb_prompt "Applied hybris-patches detected; run 'repo sync -l' & discard ALL local changes (y/N)?" ans "$SFB_YESNO_REGEX" "$ans"
 		[[ "${ans^^}" != "Y"* ]] && return
-		sfb_chroot habuild "repo sync -l" || return 1
+		sfb_chroot habuild sh -c "repo sync -l" || return 1
 	fi
 
 	#sfb_hook_exec pre-repo-sync
@@ -110,7 +110,7 @@ sfb_sync_hybris_repos() {
 		git -C "$ANDROID_ROOT/.repo/local_manifests" pull || return 1
 	fi
 	sfb_log "Syncing $branch source tree with $SFB_JOBS jobs..."
-	sfb_chroot habuild "repo sync -c -j$SFB_JOBS --fail-fast --fetch-submodules --no-clone-bundle --no-tags" || return 1
+	sfb_chroot habuild sh -c "repo sync -c -j$SFB_JOBS --fail-fast --fetch-submodules --no-clone-bundle --no-tags" || return 1
 	#sfb_hook_exec post-repo-sync
 }
 sfb_sync_extra_repos() {
