@@ -139,7 +139,7 @@ sfb_chroot_setup_ubu() {
 		-e '/mer-ubusdk-bash-setup -c / s|fi;|fi; . ${HOMEDIR}/.mersdkubu.profile;|; /mer-ubusdk-bash-setup -c / s|bash -i|bash|'
 
 	# avoid pointless warnings due to /var/run/dbus not being bind-mounted on sfossdk (anymore?)
-	$SUDO awk -i inplace -v str='/var/run/dbus' 'index($0,str){$0="#"$0} 1' "$SFOSSDK_ROOT"/usr/bin/ubu-chroot
+	$SUDO sed -i '/\/var\/run\/dbus/ s/^/#/' "$SFOSSDK_ROOT"/usr/bin/ubu-chroot
 
 	if [ "$ubu_ver" = "focal-20210531" ]; then
 		if [ $(sfb_ver $TOOLING_RELEASE) -lt $(sfb_ver 4.2) ] && ! grep -q 'bullseye' "$SFOSSDK_ROOT"/usr/bin/ubu-chroot; then
@@ -238,7 +238,8 @@ if [ "\$SFB_DEVICE" ]; then
 fi
 EOF
 
-	sfb_chroot sfossdk sh -c 'sudo zypper ref -f && \
+	sfb_chroot sfossdk sh -c 'sudo zypper mr -d adaptation0 2>/dev/null; \
+sudo zypper ref -f && \
 sudo zypper --non-interactive in android-tools-hadk kmod' || return 1
 
 	sfb_setup_hadk_env
