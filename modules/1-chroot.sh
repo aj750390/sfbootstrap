@@ -168,12 +168,12 @@ sfb_chroot_setup_ubu() {
 		# fetch old Python 2.7 compatible Repo Launcher v1.x
 		repo_url+="-1"
 	fi
-	sfb_chroot habuild "sudo curl -s $repo_url -o /usr/bin/repo && sudo chmod +x /usr/bin/repo" || return 1
+	sfb_chroot habuild sh -c "sudo curl -s $repo_url -o /usr/bin/repo && sudo chmod +x /usr/bin/repo" || return 1
 
 	if [ "$ubu_ver" = "focal-20210531" ]; then
 		# python2 is *still* used by various Android build scripts, additionally also
 		# add missing cpio for initramfs generation
-		sfb_chroot habuild 'sudo apt update && sudo apt install -y python cpio' || return 1
+		sfb_chroot habuild sh -c 'sudo apt update && sudo apt install -y python cpio' || return 1
 	fi
 }
 sfb_chroot_setup_sfossdk() {
