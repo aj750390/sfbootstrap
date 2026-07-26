@@ -9,9 +9,9 @@ PORT_TYPE=hybris
 HYBRIS_VER=18.1
 REPO_INIT_URL="https://github.com/SailfishOS-vayu/android.git"
 HAL_MAKE_TARGETS=(hybris-hal droidmedia)
-RELEASE=5.0.0.77
-#TOOLING_RELEASE=$RELEASE
-#SDK_RELEASE=latest
+RELEASE=5.0.0.61
+TOOLING_RELEASE=$RELEASE
+SDK_RELEASE=latest
 REPOS_COMMON=(
     # Poco X3 PRO common HAL
     'https://github.com/SailfishOS-vayu/android_device_xiaomi_sm8150-common.git' device/xiaomi/sm8150-common "hybris-$HYBRIS_VER" 1
